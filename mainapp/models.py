@@ -31,7 +31,7 @@ class Product(models.Model):
 class CartProduct(models.Model):
     """Здесь мы создаем класс продуктов корзины"""
     user = models.ForeignKey('Customer', verbose_name='Username', on_delete=models.CASCADE)  # здесь мы создаем пользователя который заказал продукт
-    cart = models.ForeignKey('Cart', verbose_name='Cart', on_delete=models.CASCADE)  # здесь мы создаем саму корзину
+    cart = models.ForeignKey('Cart', verbose_name='Cart', on_delete=models.CASCADE, related_name='related_products')  # здесь мы создаем саму корзину
     product = models.ForeignKey(Product, verbose_name='Product', on_delete=models.CASCADE)  # здесь мы создаем сам продукт который пользователь закинул в корзину и привязка идет к Product
     amount = models.PositiveIntegerField(default=1)  # здесь мы создаем количество данного продукта, и его количество по стандарту равняется 1
     total_price = models.DecimalField(max_digits=15, decimal_places=2, verbose_name='Total Price')  # здесь мы указываем полную цену всех наших продуктов которые находятся в корзине
@@ -44,7 +44,7 @@ class CartProduct(models.Model):
 class Cart(models.Model):
     """Здесь мы создаем саму корзину"""
     owner = models.ForeignKey('Customer', verbose_name='Customer', on_delete=models.CASCADE)  # здесь мы указываем владельца корзины
-    products = models.ManyToManyField(CartProduct)  # здесь мы указываем продукты со связью m2m потому что в одной корзине может быть несколько продуктов и несколько одинаковых продуктов могут быть в одной корзине
+    products = models.ManyToManyField(CartProduct, related_name='related_cart')  # здесь мы указываем продукты со связью m2m потому что в одной корзине может быть несколько продуктов и несколько одинаковых продуктов могут быть в одной корзине
     total_products = models.PositiveIntegerField(default=0)  # здесь мы создаем общее количество уникальных продуктов по станадарту у нас их там 0
     final_price = models.DecimalField(max_digits=15, decimal_places=2, verbose_name='Total Price')
 
@@ -64,8 +64,8 @@ class Customer(models.Model):
         return f"Customer: {self.user.last_name} {self.user.first_name}"
 
 
-class Specification(models.Model):
-    """Создаем класс харак"""
+# class Specification(models.Model):
+#     """Создаем класс харак"""
 
 
 # TODO: Создание модели Customer
