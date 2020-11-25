@@ -28,6 +28,12 @@ class Product(models.Model):
         return self.title
 
 
+class ProductImage(models.Model):
+    """Здесь мы делаем модель для картинки"""
+    product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='products', null=True, blank=True)
+
+
 class CartProduct(models.Model):
     """Здесь мы создаем класс продуктов корзины"""
     user = models.ForeignKey('Customer', verbose_name='Username', on_delete=models.CASCADE)  # здесь мы создаем пользователя который заказал продукт
@@ -57,17 +63,11 @@ class Customer(models.Model):
     """Создаем ппокупателя"""
     user = models.ForeignKey(User, verbose_name='User', on_delete=models.CASCADE)  # здесь мы создаем самого пользователя
     first_name = models.CharField(max_length=255, verbose_name="User's name")  # здесь мы создаем имя пользователя
-    phone = models.CharField(max_length=20, verbose_name="User's phone")  #  здесь мы создаем номер телефона пользователя
-    address = models.CharField(max_length=255, verbose_name='Address')  #  здесь мы создаем адрес пользователя
+    phone = models.CharField(max_length=20, verbose_name="User's phone")  # здесь мы создаем номер телефона пользователя
+    address = models.CharField(max_length=255, verbose_name='Address')  # здесь мы создаем адрес пользователя
 
     def __str__(self):
         return f"Customer: {self.user.last_name} {self.user.first_name}"
 
-
-# class Specification(models.Model):
-#     """Создаем класс харак"""
-
-
-# TODO: Создание модели Customer
 # TODO: Создание модели Заказа
 # TODO: Создание модели Specification
