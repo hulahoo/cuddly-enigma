@@ -1,0 +1,19 @@
+{% block title %}Posts in categories{% endblock title %}
+{% block body %}
+<table class="table table-borderless">
+    <thead>
+        <tr>
+            <td>Post title</td>
+            <td>Image</td>
+            <td>Action</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for post in posts %}
+            <tr>
+                 <td>{% if post.image %}<img width="100" height="100" src="{{ post.image.url }}">{% endif %}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock body %}

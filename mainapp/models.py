@@ -1,8 +1,16 @@
 """В моделях мы будем создавать категории продукты корзины"""
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.urls import reverse
+from django.utils.timezone import now
 
 User = get_user_model()
+
+
+def get_product_url(obj, viewname):
+    ct_model = obj.__class__._meta.model_name
+    return reverse(viewname, kwargs={'ct_model': ct_model, 'slug': obj.slug})
+    
 
 class Category(models.Model):
     """Создание модели категории"""
@@ -22,10 +30,20 @@ class Product(models.Model):
     image = models.ImageField(verbose_name='Image of Product')  # здесь мы создаем место для добавления картинок
     description = models.TextField(verbose_name='Description', blank=True)  # здесь мы создаем описание для продукта из TextField и описание также может быть пустым
     price = models.DecimalField(max_digits=15, decimal_places=2, verbose_name='Price')  # здесь мы создаем цену и указываем DecimalField
-
+    release_date = models.DateTimeField(default=now, verbose_name='release date')
     def __str__(self):
         """выводим удобочитаемый текст для пользователя"""
         return self.title
+
+    def get_absolute_url(self):
+        return get_product_url(self, 'product_detail')
+
+
+class Comment(models.Model):
+    product = models.ForeignKey(Product, related_name='comment', on_delete=models.CASCADE)
+    comment = models.TextField()
+    rate = models.PositiveIntegerField(default=5)
+
 
 
 class ProductImage(models.Model):

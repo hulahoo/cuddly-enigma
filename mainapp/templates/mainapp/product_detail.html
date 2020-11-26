@@ -1,0 +1,29 @@
+{% block title %}{{ post.title }}{% endblock title %}
+{% block body %}
+    <p>{{ product.title }}</p>
+    <p>{{ product.text }}</p>
+    <p>{{ product.user }}</p>
+    <p>{{ product.created_at }}</p>
+    <p>{{ product.category }}</p>
+    {% if product.image %}
+        <p><img width="500" height="300" src="{{ product.image.url }}" alt="{{ product.title }}"></p>
+    {% endif %}
+
+
+{% for comment in product.comment.all %}
+    <p>Отзыв(id): {{ comment.id }}</p>
+    <p>Отзыв: {{ comment.comment }}</p>
+    <p>Оценка: {{ comment.rate }}</p>
+{% endfor %}
+
+        <form>
+  <div class="form-group">
+    <label for="Comment">Отзыв</label>
+    <input type="text" class="form-control" id="Comment">
+      <label for="Mark">Оценка</label>
+    <input type="number" class="form-control" id="Mark">
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+{% endblock body %}
