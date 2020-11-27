@@ -1,8 +1,11 @@
 """В моделях мы будем создавать категории продукты корзины"""
+from django.conf import settings
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils.timezone import now
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 User = get_user_model()
 
@@ -60,7 +63,10 @@ class CartProduct(models.Model):
     """Здесь мы создаем класс продуктов корзины"""
     user = models.ForeignKey('Customer', verbose_name='Username', on_delete=models.CASCADE)  # здесь мы создаем пользователя который заказал продукт
     cart = models.ForeignKey('Cart', verbose_name='Cart', on_delete=models.CASCADE, related_name='related_products')  # здесь мы создаем саму корзину
-    product = models.ForeignKey(Product, verbose_name='Product', on_delete=models.CASCADE)  # здесь мы создаем сам продукт который пользователь закинул в корзину и привязка идет к Product
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='related_products', null=True)
+    object_id = models.PositiveIntegerField(null=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
+    # product = models.ForeignKey(Product, verbose_name='Product', on_delete=models.CASCADE)  # здесь мы создаем сам продукт который пользователь закинул в корзину и привязка идет к Product
     amount = models.PositiveIntegerField(default=1)  # здесь мы создаем количество данного продукта, и его количество по стандарту равняется 1
     total_price = models.DecimalField(max_digits=15, decimal_places=2, verbose_name='Total Price')  # здесь мы указываем полную цену всех наших продуктов которые находятся в корзине
 
@@ -74,7 +80,9 @@ class Cart(models.Model):
     owner = models.ForeignKey('Customer', verbose_name='Customer', on_delete=models.CASCADE)  # здесь мы указываем владельца корзины
     products = models.ManyToManyField(CartProduct, related_name='related_cart')  # здесь мы указываем продукты со связью m2m потому что в одной корзине может быть несколько продуктов и несколько одинаковых продуктов могут быть в одной корзине
     total_products = models.PositiveIntegerField(default=0)  # здесь мы создаем общее количество уникальных продуктов по станадарту у нас их там 0
-    final_price = models.DecimalField(max_digits=15, decimal_places=2, verbose_name='Total Price')
+    final_price = models.DecimalField(default=0, max_digits=15, decimal_places=2, verbose_name='Total Price')
+    in_order = models.BooleanField(default=False)
+    for_anonymous_user = models.BooleanField(default=False)
 
     def __str__(self):
         """выводим удобочитаемый текст для пользователя"""
@@ -84,12 +92,21 @@ class Cart(models.Model):
 class Customer(models.Model):
     """Создаем ппокупателя"""
     user = models.ForeignKey(User, verbose_name='User', on_delete=models.CASCADE)  # здесь мы создаем самого пользователя
-    first_name = models.CharField(max_length=255, verbose_name="User's name")  # здесь мы создаем имя пользователя
     phone = models.CharField(max_length=20, verbose_name="User's phone")  # здесь мы создаем номер телефона пользователя
     address = models.CharField(max_length=255, verbose_name='Address')  # здесь мы создаем адрес пользователя
+    first_name = models.CharField(max_length=255, verbose_name="User's name")  # здесь мы создаем имя пользователя
+
 
     def __str__(self):
-        return f"Customer: {self.user.last_name} {self.user.first_name}"
+        return f"Customer: {self.user.first_name}"
 
-# TODO: Создание модели Заказа
-# TODO: Создание модели Specification
+
+class Payment(models.Model):
+    stripe_charge_id = models.CharField(max_length=50)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.SET_NULL, blank=True, null=True)
+    amount = models.FloatField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username

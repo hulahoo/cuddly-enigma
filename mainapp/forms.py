@@ -13,3 +13,8 @@ class EditPost(forms.ModelForm):
         model = Comment
         fields = ('comment', 'rate')
 
+
+class PaymentForm(forms.Form):
+    stripeToken = forms.CharField(required=False)
+    save = forms.BooleanField(required=False)
+    use_default = forms.BooleanField(required=False)

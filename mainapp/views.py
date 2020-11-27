@@ -6,8 +6,8 @@ from django.urls import reverse_lazy
 from django.views.generic import DetailView, ListView, View, CreateView, UpdateView, DeleteView
 from django.views.generic.base import ContextMixin
 
-from .forms import AddCommentForm, EditPost
-from .models import Product, Category, Comment
+from .forms import AddCommentForm, EditPost, PaymentForm
+from .models import Product, Category, Comment, Payment
 
 
 def test_view(request):
@@ -17,24 +17,25 @@ def test_view(request):
 
 class IndexPage(ListView):
     """главная страница"""
-    model = Category
-    template_name = 'mainapp/index.html'
-    context_object_name = 'categories'
+    model = Category  # берем модельку категории
+    template_name = 'mainapp/index.html'  # указываем по какому html
+    context_object_name = 'categories'  # здесь мы указываем имя для связии с шаблоном
 
 
 class ProductListView(ListView):
     """листинг постов"""
-    paginate_by = 3
+    paginate_by = 3  # пагинация 3 продуктов на странице
     model = Product
     template_name = 'mainapp/index.html'
     context_object_name = 'products'
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        search = self.request.GET.get('q')
-        if search:
-            queryset = queryset.filter(Q(title__icontains=search) | Q(description__icontains=search))
-        return queryset
+        """Здесь мы определяем поиск"""
+        queryset = super().get_queryset()  # переопределяем родительский метод
+        search = self.request.GET.get('q')  # создаем переменную в которой мы берем из запроса с помощью GET по ключу запрос который нам прилетает
+        if search:  # если есть такое значение
+            queryset = queryset.filter(Q(title__icontains=search) | Q(description__icontains=search))  # здесь мы фильтруем по Q запросу по названию и описанию
+        return queryset  # в противном случае мы выводим queryset
 
 
 class ProductDetailView(DetailView):
@@ -66,8 +67,8 @@ class CommentCreateView(LoginRequiredMixin, ContextMixin, CreateView):
     form_class = AddCommentForm
 
     def form_valid(self, form):
-        """выполняется в том случае если все правильно"""
-        comment = self.model.objects.create(user=self.request.user, **form.cleaned_data)
+        """выполняется в том случае если все правильно."""
+        comment = self.model.objects.create(user=self.request.user, **form.cleaned_data)  # берет model и обьект который создаем и вызывает мет create(где берет пользователя через request
         return redirect(comment.get_absolute_url())
 
 
@@ -96,3 +97,14 @@ class DeleteCommentView(DeleteView):
         if obj.user != self.request.user:
             raise Http404
         return obj
+
+class PaymentView(View):
+    model = Payment
+    form_class = PaymentForm
+    def get(self, *args, **kwargs):
+        return render(self.request, 'mainapp/payment.html')
+
+
+class PaymentConfirmationView(View):
+    model = Payment
+    template_name = 'mainapp/payment_finished.html'

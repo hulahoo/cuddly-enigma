@@ -14,7 +14,6 @@
     <p>Оценка: {{ comment.rate }}</p>
     <a href="{% url 'comment_delete' comment.id %}">
     <button type="submit" value="Yes"> Delete</button>
-        </a>
 {% endfor %}
 
 <p><a href="{% url 'comment_create' product.slug %}"><button type="button" class="btn btn-primary">Оставить отзыв</button></a>
