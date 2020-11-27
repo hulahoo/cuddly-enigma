@@ -8,22 +8,15 @@
     {% if product.image %}
         <p><img width="500" height="300" src="{{ product.image.url }}" alt="{{ product.title }}"></p>
     {% endif %}
-
-
 {% for comment in product.comment.all %}
     <p>Отзыв(id): {{ comment.id }}</p>
-    <p>Отзыв: {{ comment.comment }}</p>
+    <p><a href="{% url 'comment_update' comment.id %}" > Отзыв: {{ comment.comment }}</a></p>
     <p>Оценка: {{ comment.rate }}</p>
+    <a href="{% url 'comment_delete' comment.id %}">
+    <button type="submit" value="Yes"> Delete</button>
+        </a>
 {% endfor %}
 
-        <form>
-  <div class="form-group">
-    <label for="Comment">Отзыв</label>
-    <input type="text" class="form-control" id="Comment">
-      <label for="Mark">Оценка</label>
-    <input type="number" class="form-control" id="Mark">
-  </div>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+<p><a href="{% url 'comment_create' product.slug %}"><button type="button" class="btn btn-primary">Оставить отзыв</button></a>
 
 {% endblock body %}

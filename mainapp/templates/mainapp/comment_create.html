@@ -1,0 +1,9 @@
+{% block title %}Create new comment{% endblock title %}
+{% block body %}
+<h1>Add new comment</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <button type="submit" value="Submit"> Create Comment </button>
+    </form>
+{% endblock body %}

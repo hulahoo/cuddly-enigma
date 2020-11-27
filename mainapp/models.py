@@ -42,8 +42,12 @@ class Product(models.Model):
 class Comment(models.Model):
     product = models.ForeignKey(Product, related_name='comment', on_delete=models.CASCADE)
     comment = models.TextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
     rate = models.PositiveIntegerField(default=5)
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('product_detail', kwargs={'slug': self.product.slug})
 
 
 class ProductImage(models.Model):

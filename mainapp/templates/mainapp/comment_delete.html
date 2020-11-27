@@ -1,0 +1,10 @@
+{% extends 'includes/base.html' %}
+{% block title %}Deleting post{% endblock title %}
+{% block body %}
+<h1>Are you sure to delete this post?</h1>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" value="Yes">Delete</button>
+    <a href="/">Canceled</a>
+</form>
+{% endblock body %}
